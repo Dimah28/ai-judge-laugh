@@ -28,7 +28,18 @@ JOKE = "My AI agent fixed the bug, then blamed me in a code comment \u2014 and i
 OUTPUT_DIR = os.environ.get("MAKEFUN_OUTPUT_DIR", "/output")
 
 
+def validate(joke: str) -> None:
+    """Enforce the competition's gate before writing: 1-280 Unicode code
+    points, at least one character that is not white space. Fail loudly
+    instead of writing an entry the gate would refuse."""
+    if not 1 <= len(joke) <= 280:
+        raise SystemExit(f"joke is {len(joke)} characters, must be 1-280")
+    if not any(not ch.isspace() for ch in joke):
+        raise SystemExit("joke must contain a non-whitespace character")
+
+
 def main() -> None:
+    validate(JOKE)
     output_path = Path(OUTPUT_DIR) / "entry.txt"
     output_path.parent.mkdir(parents=True, exist_ok=True)
     # Write exactly the joke: no trailing newline, the judge reads
